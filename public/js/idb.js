@@ -1,12 +1,13 @@
+console.log('idb loaded');
 let db;
 const request = indexedDB.open('budget', 1);
 
-request.onupgradeneeded = function(event) {
+request.onupgradeneeded = function (event) {
   const db = event.target.result;
   db.createObjectStore('Transaction', { autoIncrement: true });
 };
 
-request.onsuccess = function(event) {
+request.onsuccess = function (event) {
   // when db is successfully created with its object store (from onupgradedneeded event above), save reference to db in global variable
   db = event.target.result;
 
@@ -16,7 +17,7 @@ request.onsuccess = function(event) {
   }
 };
 
-request.onerror = function(event) {
+request.onerror = function (event) {
   // log error here
   console.log(event.target.errorCode);
 };
@@ -40,7 +41,7 @@ function uploadTransaction() {
   // get all records from store and set to a variable
   const getAll = budgetObjectStore.getAll();
 
-  getAll.onsuccess = function() {
+  getAll.onsuccess = function () {
     // if there was data in indexedDb's store, let's send it to the api server
     if (getAll.result.length > 0) {
       fetch('/api/transaction/bulk', {
@@ -48,12 +49,11 @@ function uploadTransaction() {
         body: JSON.stringify(getAll.result),
         headers: {
           Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        
       })
-        .then(response => response.json())
-        .then(serverResponse => {
+        .then((response) => response.json())
+        .then((serverResponse) => {
           if (serverResponse.message) {
             throw new Error(serverResponse);
           }
@@ -63,7 +63,7 @@ function uploadTransaction() {
           // clear all items in your store
           budgetObjectStore.clear();
         })
-        .catch(err => {
+        .catch((err) => {
           // set reference to redirect back here
           console.log(err);
         });

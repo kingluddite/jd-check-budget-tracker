@@ -2,7 +2,7 @@ const CACHE_NAME = 'budget-v1';
 const DATA_CACHE_NAME = 'budget-cache-v1';
 
 const FILES_TO_CACHE = [
-  "/",
+  '/',
   '../index.html',
   '../manifest.json',
   '../css/styles.css',
@@ -11,17 +11,15 @@ const FILES_TO_CACHE = [
   '../images/icons/icon-72x72.png',
   '../images/icons/icon-96x96.png',
   '../images/icons/icon-128x128.png',
-  '../images/icons/icon-144x144.png',
-  '../images/icons/icon-152x152.png',
   '../images/icons/icon-192x192.png',
   '../images/icons/icon-384x384.png',
   '../images/icons/icon-512x512.png',
 ];
 
 // Install the service worker
-self.addEventListener('install', function(evt) {
+self.addEventListener('install', function (evt) {
   evt.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
+    caches.open(CACHE_NAME).then((cache) => {
       console.log('Your files were pre-cached successfully!');
       return cache.addAll(FILES_TO_CACHE);
     })
@@ -31,11 +29,11 @@ self.addEventListener('install', function(evt) {
 });
 
 // Activate the service worker and remove old data from the cache
-self.addEventListener('activate', function(evt) {
+self.addEventListener('activate', function (evt) {
   evt.waitUntil(
-    caches.keys().then(keyList => {
+    caches.keys().then((keyList) => {
       return Promise.all(
-        keyList.map(key => {
+        keyList.map((key) => {
           if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
             console.log('Removing old cache data', key);
             return caches.delete(key);
@@ -49,14 +47,14 @@ self.addEventListener('activate', function(evt) {
 });
 
 // Intercept fetch requests
-self.addEventListener('fetch', function(evt) {
+self.addEventListener('fetch', function (evt) {
   if (evt.request.url.includes('/api/')) {
     evt.respondWith(
       caches
         .open(DATA_CACHE_NAME)
-        .then(cache => {
+        .then((cache) => {
           return fetch(evt.request)
-            .then(response => {
+            .then((response) => {
               // If the response was good, clone it and store it in the cache.
               if (response.status === 200) {
                 cache.put(evt.request.url, response.clone());
@@ -64,12 +62,12 @@ self.addEventListener('fetch', function(evt) {
 
               return response;
             })
-            .catch(err => {
+            .catch((err) => {
               // Network request failed, try to get it from the cache.
               return cache.match(evt.request);
             });
         })
-        .catch(err => console.log(err))
+        .catch((err) => console.log(err))
     );
 
     return;
